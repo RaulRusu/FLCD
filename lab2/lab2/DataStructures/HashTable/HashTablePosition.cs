@@ -14,5 +14,10 @@ namespace lab2.DataStructures.HashTable
             Bucket = bucket;
             Index = index;
         }
+
+        public override string ToString()
+        {
+            return Bucket.ToString() + " " + Index.ToString();
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace lab2.DataStructures.HashTable
 {
     public class HashTableCustom
     {
-        const int DEFAULT_BUCKET_SIZE = 1000;
+        const int DEFAULT_BUCKET_SIZE = 20;
         private LinkedListCustom[] buckets;
         public int Size { private set; get; }
 
@@ -47,12 +47,11 @@ namespace lab2.DataStructures.HashTable
         {
             var hash = hashFunction(value);
 
-            var bucket = buckets[hash];
             if (buckets[hash] == null)
-                bucket = new LinkedListCustom();
-            bucket.AddLast(value);
+                buckets[hash] = new LinkedListCustom();
+            buckets[hash].AddLast(value);
 
-            return new HashTablePosition(hash, bucket.Size - 1);
+            return new HashTablePosition(hash, buckets[hash].Size - 1);
         }
 
         /// <summary>
@@ -73,6 +72,23 @@ namespace lab2.DataStructures.HashTable
                 return null;
 
             return new HashTablePosition(hash, index.Value);
+        }
+
+        public override string ToString()
+        {
+            var index = 0;
+            var str = "";
+
+            buckets.ToList().ForEach(bucket =>
+            {
+                if (bucket != null)
+                {
+                    str += index.ToString() + ": " + bucket.ToString() + "\n";
+                }
+                index++;
+            });
+
+            return str;
         }
     }
 }

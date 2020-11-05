@@ -45,5 +45,20 @@ namespace lab2.DataStructures.LinkedList
 
             return null;
         }
+
+        public override string ToString()
+        {
+            var str = "";
+            var currentNode = this.First;
+
+            while (currentNode != null)
+            {
+                str += currentNode.Value.ToString() + " ";
+
+                currentNode = currentNode.Next;
+            }
+
+            return str;
+        }
     }
 }

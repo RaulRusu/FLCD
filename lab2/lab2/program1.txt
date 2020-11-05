@@ -1,0 +1,7 @@
+a is Int
+{
+	a = 3;
+	out(a);
+	a = (a + 1) * 3;
+	out(a);
+}

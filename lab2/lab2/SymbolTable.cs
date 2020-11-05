@@ -35,5 +35,10 @@ namespace lab2
 
             return position;
         }
+
+        public override string ToString()
+        {
+            return hashTable.ToString();
+        }
     }
 }

@@ -1,0 +1,4 @@
+; ( ) { } [ ] ,
+<= >= == !=
++ - / * / % = < > = and or 
+Bool Char Int Float array is if else do while TRUE FALSE out in
