@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
+using lab2.FiniteAutomata;
 
 namespace lab2
 {
@@ -17,6 +18,9 @@ namespace lab2
         private SymbolTable identifiersSymbolTable = new SymbolTable();
         private SymbolTable constantsSymbolTable = new SymbolTable();
         private string LastMessage = "";
+        private FiniteAutomataRunner integerAutomata = new FiniteAutomataRunner("faInteger.txt");
+        private FiniteAutomataRunner identifierAutomata = new FiniteAutomataRunner("faIdentifier.txt");
+
         public LexicalAnalyzer()
         {
         }
@@ -60,17 +64,19 @@ namespace lab2
 
         public bool IsIdentifier(string token)
         {
-            Regex regex = new Regex(@"^([a-z]|[A-Z])([a-z]|[A-Z]|[0-9])*$");
+            /*Regex regex = new Regex(@"^([a-z]|[A-Z])([a-z]|[A-Z]|[0-9])*$");
             var match = regex.Match(token);
-            return match.Success;
+            return match.Success;*/
+            return identifierAutomata.IsAccepted(token);
         }
 
         /// regex: ^-?(0|[1-9]+[0-9]*)$
         public bool IsInt(string token)
         {
-            Regex regex = new Regex(@"^-?(0|[1-9]+[0-9]*)$");
+            /*Regex regex = new Regex(@"^-?(0|[1-9]+[0-9]*)$");
             var match = regex.Match(token);
-            return match.Success;
+            return match.Success;*/
+            return integerAutomata.IsAccepted(token);
         }
         /// regex: ^-?[0-9]+\.[0-9]+$
         public bool IsFloat(string token)

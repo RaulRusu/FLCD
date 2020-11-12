@@ -7,11 +7,14 @@ namespace lab2
     {
         static void Main(string[] args)
         {
-            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+            /*LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
             lexicalAnalyzer.Initialize();
 
             lexicalAnalyzer.Scan(System.IO.File.ReadAllText("program3.txt"));
-            lexicalAnalyzer.Log();
+            lexicalAnalyzer.Log();*/
+
+            var console = new FiniteAutomata.FiniteAutomataConsole();
+            console.Run();
         }
     }
 }
