@@ -74,18 +74,19 @@ namespace lab2.LR0.Models
             return symbol.ToString();
         }
 
-        public void MoveDot()
+        public LR0Item MoveDot()
         {
             var dotIndex = GetDotIndex();
 
             if (dotIndex == rhs.Length - 1)
-                return;
+                return this;
 
             var rhsBuilder = new StringBuilder(rhs);
             rhsBuilder[dotIndex] = rhsBuilder[dotIndex + 1];
             rhsBuilder[dotIndex + 1] = '.';
 
-            rhs = rhsBuilder.ToString();
+            var newLR0Item = new LR0Item(lhs, rhsBuilder.ToString());
+            return newLR0Item;
         }
 
         public override bool Equals(object obj)

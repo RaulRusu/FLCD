@@ -117,16 +117,13 @@ namespace lab2.LR0
                     })
                 .ToList();
 
-            var originalInputItems = new List<LR0Item>();
-            originalInputItems.AddRange(inputItems);
+            var newItems = inputItems.Select(item => item.MoveDot()).ToList();
 
-            inputItems.ForEach(item => item.MoveDot());
-
-            if (inputItems.Count != 0)
+            if (newItems.Count != 0)
             {
                 foreach (var calculatedState in calculatedStates)
                 {
-                    if (calculatedState.Key.Equals(new ClosureAction(inputItems)))
+                    if (calculatedState.Key.Equals(new ClosureAction(newItems)))
                     {
                         resultState = calculatedState.Value;
                         isNew = false;
@@ -135,10 +132,10 @@ namespace lab2.LR0
 
                 if (resultState == null)
                 {
-                    var closure = Closure(inputItems);
+                    var closure = Closure(newItems);
                     resultState = new LR0State(closure);
 
-                    calculatedStates.Add(new KeyValuePair<ClosureAction, LR0State>(new ClosureAction(originalInputItems), resultState));
+                    calculatedStates.Add(new KeyValuePair<ClosureAction, LR0State>(new ClosureAction(newItems), resultState));
                 }
             }
             
