@@ -1,4 +1,5 @@
 ﻿using lab2.DataStructures.HashTable;
+using lab2.LR0.LR0Tester;
 using System;
 
 namespace lab2
@@ -13,7 +14,11 @@ namespace lab2
             lexicalAnalyzer.Scan(System.IO.File.ReadAllText("program3.txt"));
             lexicalAnalyzer.Log();*/
 
-            var console = new FiniteAutomata.FiniteAutomataConsole();
+            /*var console = new FiniteAutomata.FiniteAutomataConsole();
+            console.Run();*/
+
+            var console = new ConsoleLR0Parser();
+
             console.Run();
         }
     }
