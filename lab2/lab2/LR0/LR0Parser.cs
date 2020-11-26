@@ -8,6 +8,14 @@ using lab2.LR0.Models;
 
 namespace lab2.LR0
 {
+    public enum StateType
+    {
+        Shift,
+        Reduce,
+        Acc,
+        Conflict
+    }
+
     public class LR0Parser
     {
         private const bool IS_LOGGER_ACTOVE = true;
@@ -15,6 +23,7 @@ namespace lab2.LR0
         private Grammar grammar;
         private AugmentedGrammar augmentedGrammar;
         private List<KeyValuePair<ClosureAction, LR0State>> calculatedStates = new List<KeyValuePair<ClosureAction, LR0State>>();
+        private List<List<string>> table = new List<List<string>>();
 
         private void Log(object obj)
         {
@@ -144,6 +153,7 @@ namespace lab2.LR0
 
         public List<LR0State> CanonicalCollection()
         {
+            var stateID = -1;
             var unprocessedStats = new Stack<LR0State>();
             var canonicalCollection = new List<LR0State>();
 
@@ -155,6 +165,8 @@ namespace lab2.LR0
             while (unprocessedStats.Count != 0)
             {
                 var currentState = unprocessedStats.Pop();
+                stateID++;
+                currentState.StateID = stateID;
                 canonicalCollection.Add(currentState);
 
                 Log("State:");
@@ -179,6 +191,93 @@ namespace lab2.LR0
             }
 
             return canonicalCollection;
+        }
+
+        public bool IsAccepted(LR0State state)
+        {
+            if (state.Items.Count == 1)
+            {
+                var accItem = new LR0Item(augmentedGrammar.StartingSymbol, "." + grammar.StartingSymbol);
+                if (accItem.Equals(state.Items[0]))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool IsShift(LR0State state)
+        {
+            foreach (var item in state.Items)
+            {
+                var index = item.rhs.IndexOf('.');
+                if (index == item.rhs.Length - 1)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool IsReduce(LR0State state)
+        {
+            if (state.Items.Count == 1)
+            {
+                var item = state.Items[0];
+                var index = item.rhs.IndexOf('.');
+                if (index != item.rhs.Length - 1)
+                    return false;
+            }
+            return false;
+        }
+
+        public void CreateTable()
+        {
+            var canonicalCollection = CanonicalCollection();
+            Enumerable.Range(0, canonicalCollection.Count + 1).ToList().ForEach(index =>
+            {
+                table.Add(new List<string>());
+                Enumerable.Range(0, grammar.AllSymbols.Count + 2).ToList().ForEach(j =>
+                {
+                    table[index].Add("");
+                });
+                table[index][0] = (index - 1).ToString();
+            });
+
+            table[0][0] = "nr";
+            table[0][1] = "action";
+
+            var index = 2;
+
+            var symbolMap = new Dictionary<string, int>();
+
+            grammar.AllSymbols.ForEach(symbol =>
+            {
+                table[0][index] = symbol;
+                symbolMap[symbol] = index;
+                index++;
+            });
+
+            canonicalCollection.ForEach(state =>
+            {
+                augmentedGrammar.AllSymbols.ForEach(symbol =>
+                {
+                    var gotoResult = Goto(state, symbol);
+                    if (gotoResult.Key != null)
+                    {
+                        var gotoState = gotoResult.Key;
+                        var i = state.StateID + 1;
+                        var j = symbolMap[symbol];
+
+                        table[i][j] = gotoState.StateID.ToString();
+                    }
+                });
+            });
+
+            table.ForEach(row =>
+            {
+                var str = "";
+                row.ForEach(item => str += item + " ");
+                Console.WriteLine(str);
+            });
         }
     }
 }

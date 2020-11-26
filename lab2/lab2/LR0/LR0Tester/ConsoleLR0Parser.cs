@@ -12,7 +12,7 @@ namespace lab2.LR0.LR0Tester
         {
             while (true)
             {
-                parser.CanonicalCollection();
+                parser.CreateTable();
 
                 Console.WriteLine("1 - nonterminals");
                 Console.WriteLine("2 - terminals");
