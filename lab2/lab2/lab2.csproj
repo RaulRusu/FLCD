@@ -18,6 +18,9 @@
     <None Update="lr01.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="lr0seq.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="program1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

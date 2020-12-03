@@ -18,7 +18,7 @@ namespace lab2.LR0
 
     public class LR0Parser
     {
-        private const bool IS_LOGGER_ACTOVE = true;
+        private const bool IS_LOGGER_ACTOVE = false;
 
         private Grammar grammar;
         private AugmentedGrammar augmentedGrammar;
@@ -248,9 +248,8 @@ namespace lab2.LR0
             return -1;
         }
 
-        public void CreateTable()
+        public void CreateTable(List<LR0State> canonicalCollection)
         {
-            var canonicalCollection = CanonicalCollection();
             Enumerable.Range(0, canonicalCollection.Count + 1).ToList().ForEach(index =>
             {
                 table.Add(new List<string>());
@@ -311,18 +310,15 @@ namespace lab2.LR0
                 }    
             });
 
-            table.ForEach(row =>
-            {
-                var str = "";
-                row.ForEach(item => str += item + " ");
-                Console.WriteLine(str);
-            });
         }
 
-        public void Parse(string sequence)
+        public string Parse(string sequence)
         {
+            var canonicalCollection = CanonicalCollection();
+            CreateTable(canonicalCollection);
             var index = 2;
             var symbolMap = new Dictionary<string, int>();
+            var err = "";
 
             grammar.AllSymbols.ForEach(symbol =>
             {
@@ -355,8 +351,17 @@ namespace lab2.LR0
                 {
                     if (!symbolMap.ContainsKey(symbol))
                     {
-                        Log("Err in parser");
-                            return;
+                        var state = canonicalCollection.Where(state => state.StateID == nr).FirstOrDefault();
+                        err += "Err in parser\n";
+                        if (state != null)
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, state);
+                        }
+                        else
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, "state is null");
+                        }
+                        return err;
                     }
 
                     var j = symbolMap[symbol];
@@ -365,8 +370,17 @@ namespace lab2.LR0
 
                     if (table[nr + 1][j] == "")
                     {
-                        Log("Err in parser");
-                        return;
+                        var state = canonicalCollection.Where(state => state.StateID == nr).FirstOrDefault();
+                        err += "Err in parser\n";
+                        if (state != null)
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, state);
+                        }
+                        else
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, "state is null");
+                        }
+                        return err;
                     }
 
                     input.Dequeue();
@@ -387,10 +401,19 @@ namespace lab2.LR0
                     var newNr = Int32.Parse(workingStack.Peek());
                     var j = symbolMap[production.lhs];
 
-                    if (table[nr + 1][j] == "")
+                    if (table[newNr + 1][j] == "")
                     {
-                        Log("Err in parser");
-                        return;
+                        var state = canonicalCollection.Where(state => state.StateID == nr).FirstOrDefault();
+                        err += "Err in parser\n";
+                        if (state != null)
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, state);
+                        }
+                        else
+                        {
+                            err += String.Format("{0}\n{1}\n{2}", "shift", symbol, "state is null");
+                        }
+                        return err;
                     }
 
                     workingStack.Push(production.lhs);
@@ -400,6 +423,12 @@ namespace lab2.LR0
                 }
             }
 
+            var result = "";
+
+            output.ForEach(prod => result = prod + ", " + result);
+            result = result.Substring(0, result.Length - 2);
+
+            return result;
         }
     }
 }
