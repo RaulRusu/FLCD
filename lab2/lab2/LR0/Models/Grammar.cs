@@ -11,6 +11,8 @@ namespace lab2.LR0.Models
         public List<string> Nonterminals { get; set; }
         public List<string> Terminals { get; set; }
         public Dictionary<string, List<string>> Productions { get; set; } = new Dictionary<string, List<string>>();
+        public List<LR0Item> ProductionList = new List<LR0Item>();
+
         public string StartingSymbol { get; set; }
 
         public List<string> AllSymbols = new List<string>();
@@ -40,6 +42,7 @@ namespace lab2.LR0.Models
                     if (!grammarProductionsRef.ContainsKey(lhs))
                         grammarProductionsRef[lhs] = new List<string>();
                     grammarProductionsRef[lhs].Add(rhs);
+                    grammar.ProductionList.Add(new LR0Item(lhs, rhs));
                 }
             }
             catch (Exception ex)

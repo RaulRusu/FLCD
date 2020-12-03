@@ -197,7 +197,7 @@ namespace lab2.LR0
         {
             if (state.Items.Count == 1)
             {
-                var accItem = new LR0Item(augmentedGrammar.StartingSymbol, "." + grammar.StartingSymbol);
+                var accItem = new LR0Item(augmentedGrammar.StartingSymbol, grammar.StartingSymbol + ".");
                 if (accItem.Equals(state.Items[0]))
                     return true;
             }
@@ -226,7 +226,26 @@ namespace lab2.LR0
                 if (index != item.rhs.Length - 1)
                     return false;
             }
-            return false;
+            return true;
+        }
+
+        public int ReduceTo(LR0State state)
+        {
+            var item = state.Items[0];
+
+            var lhsItem = item.lhs;
+            var rhsItem = item.rhs.Substring(0, item.rhs.Length - 1);
+            var newItem = new LR0Item(lhsItem, rhsItem);
+
+            var index = 0;
+            foreach(var originalItem in grammar.ProductionList)
+            {
+                if (originalItem.Equals(newItem))
+                    return index;
+                index++;
+            }
+
+            return -1;
         }
 
         public void CreateTable()
@@ -272,12 +291,115 @@ namespace lab2.LR0
                 });
             });
 
+            canonicalCollection.ForEach(state =>
+            {
+                if (IsAccepted(state))
+                    table[state.StateID + 1][1] = "acc";
+                else
+                if (IsShift(state))
+                    table[state.StateID + 1][1] = "shift";
+                else
+                if (IsReduce(state))
+                {
+                    var productionIndex = ReduceTo(state);
+                    table[state.StateID + 1][1] = productionIndex.ToString();
+                }
+                else
+                {
+                    Log("err");
+                    Log(state);
+                }    
+            });
+
             table.ForEach(row =>
             {
                 var str = "";
                 row.ForEach(item => str += item + " ");
                 Console.WriteLine(str);
             });
+        }
+
+        public void Parse(string sequence)
+        {
+            var index = 2;
+            var symbolMap = new Dictionary<string, int>();
+
+            grammar.AllSymbols.ForEach(symbol =>
+            {
+                symbolMap[symbol] = index;
+                index++;
+            });
+
+            var workingStack = new Stack<string>();
+            var input = new Queue<string>();
+            var output = new List<int>();
+
+            workingStack.Push("$");
+            workingStack.Push("0");
+
+            foreach (var c in sequence)
+            {
+                input.Enqueue(c.ToString());
+            }
+            input.Enqueue("$");
+
+            while (true)
+            {
+                var symbol = input.Peek();
+                var nr = Int32.Parse(workingStack.Peek());
+
+                if (table[nr + 1][1] == "acc")
+                    break;
+                else
+                if(table[nr + 1][1] == "shift")
+                {
+                    if (!symbolMap.ContainsKey(symbol))
+                    {
+                        Log("Err in parser");
+                            return;
+                    }
+
+                    var j = symbolMap[symbol];
+                    workingStack.Push(symbol);
+                    workingStack.Push(table[nr + 1][j]);
+
+                    if (table[nr + 1][j] == "")
+                    {
+                        Log("Err in parser");
+                        return;
+                    }
+
+                    input.Dequeue();
+                }
+                else
+                {
+                    var producutionNr = Int32.Parse(table[nr + 1][1]);
+                    var production = grammar.ProductionList[producutionNr];
+
+                    var nrOfPops = production.rhs.Length * 2;
+
+                    while (nrOfPops > 0)
+                    {
+                        workingStack.Pop();
+                        nrOfPops--;
+                    }
+
+                    var newNr = Int32.Parse(workingStack.Peek());
+                    var j = symbolMap[production.lhs];
+
+                    if (table[nr + 1][j] == "")
+                    {
+                        Log("Err in parser");
+                        return;
+                    }
+
+                    workingStack.Push(production.lhs);
+                    workingStack.Push(table[newNr + 1][j]);
+
+                    output.Add(producutionNr);
+                }
+            }
+
         }
     }
 }

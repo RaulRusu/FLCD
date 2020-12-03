@@ -13,6 +13,7 @@ namespace lab2.LR0.LR0Tester
             while (true)
             {
                 parser.CreateTable();
+                parser.Parse("adbbc");
 
                 Console.WriteLine("1 - nonterminals");
                 Console.WriteLine("2 - terminals");
